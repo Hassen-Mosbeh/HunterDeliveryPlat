@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const { Roles } = require('../utils/enums');
+const bcrypt = require('bcryptjs');
+const { Roles,UserStatus } = require('../utils/enums');
 const baseOptions = {
   discriminatorKey: 'userType',
   collection: 'users',
@@ -32,20 +32,19 @@ const userSchema = new mongoose.Schema({
         enum: Object.values(Roles),
         required: true
         
+    },
+    userstatus: {
+        type: Number,
+        enum: Object.values(UserStatus),
+        default: UserStatus.ACTIVE
     }
 }, baseOptions)
 
-userSchema.pre('save', async function(next) {
-    try {
-        if (this.isModified('password') || this.isNew) {
-            const saltRounds = 10;
-            const hash = await bcrypt.hash(this.password, saltRounds);
-            this.password = hash;
-        }
-        next();
-    } catch (err) {
-        next(err);
-    }
+userSchema.pre('save', async function () {
+  if (this.isModified('password') || this.isNew) {
+    const saltRounds = 10;
+    this.password = await bcrypt.hash(this.password, saltRounds);
+  }
 });
 module.exports=mongoose.model("user",userSchema)
     

@@ -25,5 +25,5 @@ const userSchema = new mongoose.Schema({
         trim: true
     },
 });
-UserModel.discriminator('restaurant', userSchema);
-module.exports = mongoose.model('restaurant', userSchema);
+const RestaurantModel = mongoose.models.restaurant || UserModel.discriminator('restaurant', userSchema);
+module.exports = RestaurantModel;
