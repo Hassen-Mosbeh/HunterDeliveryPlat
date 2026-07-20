@@ -7,6 +7,8 @@ const userRouter = require("./Routes/UserRoutes");
 const authMiddleware = require("./Middleware/authMiddleware");
 const clientRouter = require("./Routes/ClientRoutes");
 const restoRouter = require("./Routes/RestoRoutes");
+const driverRouter = require("./Routes/DriverRoutes");
+const categoryrouter = require("./Routes/CategoryRoutes");
 
 require("dotenv").config();
 
@@ -27,6 +29,10 @@ app.use("/api/clients", clientRouter);
 app.use("/api/users", authMiddleware, userRouter);
 
 app.use("/api/restaurants", restoRouter);
+
+app.use("/api/drivers", driverRouter);
+
+app.use("/api/categories",categoryrouter);
 
 
 // Basic API health response for unmatched root access.

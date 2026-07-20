@@ -10,4 +10,11 @@ const UserStatus = {
 	INACTIVE: 0,
 };
 
-module.exports = { Roles, UserStatus };
+const AvailabilityStatus = {
+	AVAILABLE: 1,
+	UNAVAILABLE: 0,
+};
+
+
+
+module.exports = { Roles, UserStatus, AvailabilityStatus};

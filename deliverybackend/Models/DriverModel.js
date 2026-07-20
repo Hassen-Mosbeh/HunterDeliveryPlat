@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-UserModel = require('./UsersModel');
+const UserModel = require('./UsersModel');
+const { AvailabilityStatus } = require('../utils/enums');
 
 const driverSchema = new mongoose.Schema({
     firstname: {
@@ -23,11 +24,11 @@ const driverSchema = new mongoose.Schema({
     },
 
     //TODO: Add availability status field to the driver schema
-    availabilityStatus: {
-        type: Boolean,
-        default: 0,
-        enumer: [0, 1],
-    }
+    //availabilityStatus: {
+        //type: Number,
+        //enum: Object.values(AvailabilityStatus),
+        //default: AvailabilityStatus.AVAILABLE  
+    //}
 });
-UserModel.discriminator('driver', driverSchema);
-module.exports = mongoose.model('driver', driverSchema);
+const DriverModel = mongoose.models.driver || UserModel.discriminator('driver', driverSchema);
+module.exports = DriverModel;
