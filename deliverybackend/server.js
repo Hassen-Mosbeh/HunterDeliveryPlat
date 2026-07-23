@@ -10,7 +10,8 @@ const restoRouter = require("./Routes/RestoRoutes");
 const driverRouter = require("./Routes/DriverRoutes");
 const categoryRouter = require("./Routes/CategoryRoutes");
 const productRouter = require("./Routes/ProductRoutes");
-const orderRouter = require("./Routes/Restaurant/OrderRoutes");
+const orderRouter = require("./Routes/OrderRoutes");
+
 
 require("dotenv").config();
 

@@ -1,12 +1,12 @@
 const express = require("express");
-const authMiddleware = require("../../Middleware/authMiddleware");
+const authMiddleware = require("../Middleware/authMiddleware");
 const {
   getRestaurantOrders,
   getOrderById,
   acceptOrder,
   rejectOrder,
   updateOrderStatus,
-} = require("../../Controllers/Restaurant/OrderController");
+} = require("../Controllers/Restaurant/OrderController");
 
 const router = express.Router();
 
