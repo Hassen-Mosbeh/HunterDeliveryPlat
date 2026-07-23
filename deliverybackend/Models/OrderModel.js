@@ -66,8 +66,8 @@ const orderSchema = new mongoose.Schema(
     },
     paymentStatus: {
       type: Number,
-      enum: Object.values(PaymentStatus || {}),
-      default: PaymentStatus ? PaymentStatus.PENDING : 0,
+      enum: Object.values(OrderStatus),
+      default: OrderStatus.PENDING,
     },
     status: {
       type: Number,
