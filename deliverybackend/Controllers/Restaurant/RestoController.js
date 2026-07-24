@@ -1,8 +1,7 @@
-
-const RestaurantModel = require("../Models/RestoModel");
-const { Roles } = require("../utils/enums");
-const createToken = require("../utils/createToken");
-const UserModel = require("../Models/UsersModel");
+const RestaurantModel = require("../../Models/RestoModel");
+const { Roles } = require("../../utils/enums");
+const createToken = require("../../utils/createToken");
+const UserModel = require("../../Models/UsersModel");
 
 const register = async (req, res) => {
   try {
@@ -130,9 +129,23 @@ const getRestaurantProfile = async (req, res) => {
 
 const updateRestaurantProfile = async (req, res) => {
   try {
-    const { restaurantName, ownerName, cuisineType, businessAddress, phone, logo } = req.body;
+    const {
+      restaurantName,
+      ownerName,
+      cuisineType,
+      businessAddress,
+      phone,
+      logo,
+    } = req.body;
 
-    if (restaurantName === undefined && ownerName === undefined && cuisineType === undefined && businessAddress === undefined && phone === undefined && logo === undefined) {
+    if (
+      restaurantName === undefined &&
+      ownerName === undefined &&
+      cuisineType === undefined &&
+      businessAddress === undefined &&
+      phone === undefined &&
+      logo === undefined
+    ) {
       return res.status(400).json({
         message: "At least one valid field is required to update",
       });
@@ -159,10 +172,12 @@ const updateRestaurantProfile = async (req, res) => {
       restaurant.phone = normalizedPhone;
     }
 
-    if (restaurantName !== undefined) restaurant.restaurantName = restaurantName.trim();
+    if (restaurantName !== undefined)
+      restaurant.restaurantName = restaurantName.trim();
     if (ownerName !== undefined) restaurant.ownerName = ownerName.trim();
     if (cuisineType !== undefined) restaurant.cuisineType = cuisineType.trim();
-    if (businessAddress !== undefined) restaurant.businessAddress = businessAddress.trim();
+    if (businessAddress !== undefined)
+      restaurant.businessAddress = businessAddress.trim();
     if (logo !== undefined) restaurant.logo = logo.trim();
 
     await restaurant.save();

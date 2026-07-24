@@ -11,7 +11,7 @@ const driverRouter = require("./Routes/DriverRoutes");
 const categoryRouter = require("./Routes/CategoryRoutes");
 const productRouter = require("./Routes/ProductRoutes");
 const orderRouter = require("./Routes/OrderRoutes");
-
+const restaurantDashboardRouter = require("./Routes/Dashboard/RestaurantDashboardRoutes");
 
 require("dotenv").config();
 
@@ -40,6 +40,8 @@ app.use("/api/categories", categoryRouter);
 app.use("/api/products", productRouter);
 
 app.use("/api/restaurants/orders", orderRouter);
+
+app.use("/api/restaurants/dashboard", restaurantDashboardRouter);
 
 // Basic API health response for unmatched root access.
 app.get("/", (req, res) => {
