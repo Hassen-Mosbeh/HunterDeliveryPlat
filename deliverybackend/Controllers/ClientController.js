@@ -1,7 +1,10 @@
 const ClientModel = require("../Models/ClientModel");
-const { Roles } = require("../utils/enums");
+const RestaurantModel = require("../Models/RestoModel");
+const ProductModel = require("../Models/ProductModel");
+const { Roles, AvailabilityStatus, UserStatus } = require("../utils/enums");
 const createToken = require("../utils/createToken");
 const UserModel = require("../Models/UsersModel");
+const mongoose = require("mongoose");
 
 const register = async (req, res) => {
   try {
@@ -81,6 +84,84 @@ const register = async (req, res) => {
   }
 };
 
+const getRestaurants = async (req, res) => {
+  try {
+    if (req.user.role !== Roles.CLIENT) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const restaurants = await RestaurantModel.find({
+      availabilityStatus: AvailabilityStatus.AVAILABLE,
+      userstatus: UserStatus.ACTIVE,
+    })
+      .select("restaurantName logo cuisineType businessAddress availabilityStatus")
+      .sort({ restaurantName: 1 });
+
+    return res.status(200).json({
+      success: true,
+      count: restaurants.length,
+      data: restaurants,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const getRestaurantProducts = async (req, res) => {
+  try {
+    if (req.user.role !== Roles.CLIENT) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const { restaurantId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(restaurantId)) {
+      return res.status(400).json({ message: "Invalid restaurant ID" });
+    }
+
+    const restaurant = await RestaurantModel.findById(restaurantId);
+
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    if (
+      restaurant.availabilityStatus !== AvailabilityStatus.AVAILABLE ||
+      restaurant.userstatus !== UserStatus.ACTIVE
+    ) {
+      return res.status(400).json({ message: "Restaurant is currently unavailable" });
+    }
+
+    const products = await ProductModel.find({
+      restaurant: restaurantId,
+      isAvailable: true,
+    })
+      .select("name description price image isAvailable category")
+      .sort({ name: 1 })
+      .populate("category", "_id name");
+
+    return res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 module.exports = {
   register,
+  getRestaurants,
+  getRestaurantProducts,
 };
