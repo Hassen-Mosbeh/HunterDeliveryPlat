@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
   availabilityStatus: {
     type: Number,
     enum: Object.values(AvailabilityStatus),
-    default: AvailabilityStatus.AVAILABLE,
+    default: AvailabilityStatus.UNAVAILABLE,
   },
 });
 const RestaurantModel =

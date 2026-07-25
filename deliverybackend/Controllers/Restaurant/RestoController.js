@@ -1,5 +1,5 @@
 const RestaurantModel = require("../../Models/RestoModel");
-const { Roles } = require("../../utils/enums");
+const { Roles, AvailabilityStatus } = require("../../utils/enums");
 const createToken = require("../../utils/createToken");
 const UserModel = require("../../Models/UsersModel");
 
@@ -218,8 +218,78 @@ const updateRestaurantProfile = async (req, res) => {
   }
 };
 
+const toggleAvailability = async (req, res) => {
+  try {
+    const restaurant = await RestaurantModel.findById(req.user.id);
+
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    restaurant.availabilityStatus =
+      restaurant.availabilityStatus === AvailabilityStatus.AVAILABLE
+        ? AvailabilityStatus.UNAVAILABLE
+        : AvailabilityStatus.AVAILABLE;
+
+    await restaurant.save();
+
+    const statusLabel =
+      restaurant.availabilityStatus === AvailabilityStatus.AVAILABLE
+        ? "online"
+        : "offline";
+
+    return res.status(200).json({
+      status: "success",
+      message: `Restaurant is now ${statusLabel}`,
+      data: {
+        availabilityStatus: restaurant.availabilityStatus,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+    });
+  }
+};
+
+const getAvailabilityStatus = async (req, res) => {
+  try {
+    const restaurant = await RestaurantModel.findById(req.user.id);
+
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    const statusLabel =
+      restaurant.availabilityStatus === AvailabilityStatus.AVAILABLE
+        ? "online"
+        : "offline";
+
+    return res.status(200).json({
+      status: "success",
+      message: "Availability status retrieved successfully",
+      data: {
+        availabilityStatus: restaurant.availabilityStatus,
+        label: statusLabel,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+    });
+  }
+};
+
 module.exports = {
   register,
   getRestaurantProfile,
   updateRestaurantProfile,
+  toggleAvailability,
+  getAvailabilityStatus,
 };
