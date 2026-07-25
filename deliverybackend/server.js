@@ -43,6 +43,7 @@ app.use("/api/restaurants/orders", orderRouter);
 
 app.use("/api/restaurants/dashboard", restaurantDashboardRouter);
 
+
 // Basic API health response for unmatched root access.
 app.get("/", (req, res) => {
   res.status(200).json({ status: "success", message: "API is running" });
