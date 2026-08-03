@@ -17,3 +17,4 @@ router.get("/restaurants/:restaurantId/products", authMiddleware, getRestaurantP
 router.post("/orders", authMiddleware, createOrder);
 
 module.exports = router;
+  

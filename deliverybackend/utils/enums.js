@@ -21,6 +21,7 @@ const OrderStatus = {
   READY_FOR_PICKUP: 2,
   CANCELLED: 3,
   DELIVERED: 4,
+  OUT_FOR_DELIVERY: 5,
 };
 
 const PaymentStatus = {

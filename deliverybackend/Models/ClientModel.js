@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const UserModel = require("./UsersModel");
 
+//TODO: Add MULTIPLE addresses for clients, and add a default address field to the client model.
+
 const clientSchema = new mongoose.Schema({
   firstname: {
     type: String,

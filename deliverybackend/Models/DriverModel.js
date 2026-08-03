@@ -22,13 +22,12 @@ const driverSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-
-    //TODO: Add availability status field to the driver schema
-    //availabilityStatus: {
-        //type: Number,
-        //enum: Object.values(AvailabilityStatus),
-        //default: AvailabilityStatus.AVAILABLE  
-    //}
+ 
+    availabilityStatus: {
+        type: Number,
+        enum: Object.values(AvailabilityStatus),
+        default: AvailabilityStatus.AVAILABLE  
+    }
 });
 const DriverModel = mongoose.models.driver || UserModel.discriminator('driver', driverSchema);
 module.exports = DriverModel;

@@ -1,5 +1,7 @@
+const mongoose = require('mongoose');
 const DriverModel = require("../Models/DriverModel");
-const { Roles } = require("../utils/enums");
+const OrderModel = require("../Models/OrderModel");
+const { Roles, OrderStatus } = require("../utils/enums");
 const createToken = require("../utils/createToken");
 const UserModel = require("../Models/UsersModel");
 
@@ -99,6 +101,167 @@ const register = async (req, res) => {
   }
 };
 
+const getAvailableDeliveries = async (req, res) => {
+  try {
+    const orders = await OrderModel.find({
+      driver: req.user.id,
+      status: OrderStatus.OUT_FOR_DELIVERY,
+    })
+      .populate('restaurant', '_id restaurantName businessAddress phone')
+      .populate('client', '_id firstname lastname phone')
+      .sort({ createdAt: 1 })
+      .lean();
+
+    const data = orders.map((order) => ({
+      _id: order._id,
+      status: order.status,
+      totalPrice: order.totalPrice,
+      deliveryAddress: order.deliveryAddress,
+      restaurant: order.restaurant
+        ? {
+            _id: order.restaurant._id,
+            restaurantName: order.restaurant.restaurantName,
+            businessAddress: order.restaurant.businessAddress,
+            phone: order.restaurant.phone,
+          }
+        : null,
+      client: order.client
+        ? {
+            _id: order.client._id,
+            name: `${order.client.firstname || ''} ${order.client.lastname || ''}`.trim(),
+            phone: order.client.phone,
+          }
+        : null,
+    }));
+
+    return res.status(200).json({ success: true, count: data.length, data });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+const getCurrentDeliveries = async (req, res) => {
+  try {
+    const orders = await OrderModel.find({
+      driver: req.user.id,
+      status: { $nin: [OrderStatus.DELIVERED, OrderStatus.CANCELLED] },
+    })
+      .populate('restaurant', '_id restaurantName businessAddress phone')
+      .populate('client', '_id firstname lastname phone')
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const data = orders.map((order) => ({
+      _id: order._id,
+      status: order.status,
+      totalPrice: order.totalPrice,
+      deliveryAddress: order.deliveryAddress,
+      restaurant: order.restaurant
+        ? {
+            _id: order.restaurant._id,
+            restaurantName: order.restaurant.restaurantName,
+            businessAddress: order.restaurant.businessAddress,
+            phone: order.restaurant.phone,
+          }
+        : null,
+      client: order.client
+        ? {
+            _id: order.client._id,
+            name: `${order.client.firstname || ''} ${order.client.lastname || ''}`.trim(),
+            phone: order.client.phone,
+          }
+        : null,
+    }));
+
+    return res.status(200).json({ success: true, count: data.length, data });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+const updateDeliveryStatus = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+      return res.status(400).json({ success: false, message: 'Invalid orderId' });
+    }
+
+    const order = await OrderModel.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    if (String(order.driver) !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'Order does not belong to this driver' });
+    }
+
+    if (order.status !== OrderStatus.OUT_FOR_DELIVERY) {
+      return res.status(400).json({ success: false, message: 'Order status must be OUT_FOR_DELIVERY to mark as delivered' });
+    }
+
+    order.status = OrderStatus.DELIVERED;
+    await order.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Order delivered successfully',
+      data: { _id: order._id, status: order.status },
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+const getDeliveryHistory = async (req, res) => {
+  try {
+    const orders = await OrderModel.find({
+      driver: req.user.id,
+      status: OrderStatus.DELIVERED,
+    })
+      .populate('restaurant', '_id restaurantName businessAddress phone')
+      .populate('client', '_id firstname lastname phone')
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const data = orders.map((order) => ({
+      _id: order._id,
+      status: order.status,
+      totalPrice: order.totalPrice,
+      deliveryAddress: order.deliveryAddress,
+      deliveredAt: order.updatedAt,
+      restaurant: order.restaurant
+        ? {
+            _id: order.restaurant._id,
+            restaurantName: order.restaurant.restaurantName,
+            businessAddress: order.restaurant.businessAddress,
+            phone: order.restaurant.phone,
+          }
+        : null,
+      client: order.client
+        ? {
+            _id: order.client._id,
+            name: `${order.client.firstname || ''} ${order.client.lastname || ''}`.trim(),
+            phone: order.client.phone,
+          }
+        : null,
+    }));
+
+    return res.status(200).json({ success: true, count: data.length, data });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
 module.exports = {
   register,
+  getAvailableDeliveries,
+  getCurrentDeliveries,
+  updateDeliveryStatus,
+  getDeliveryHistory,
 };

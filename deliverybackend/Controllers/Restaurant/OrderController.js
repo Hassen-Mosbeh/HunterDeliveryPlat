@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 const OrderModel = require("../../Models/OrderModel");
 const { OrderStatus } = require("../../utils/enums");
 
+//TODO: add orderdetails in return function
+
 const findRestaurantOrder = async (restaurantId, orderId) => {
   if (!mongoose.Types.ObjectId.isValid(orderId)) {
     throw new Error("Invalid order id");
