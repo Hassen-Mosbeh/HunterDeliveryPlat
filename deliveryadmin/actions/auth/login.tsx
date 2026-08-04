@@ -12,7 +12,7 @@ interface LoginResponse {
 
 export const loginUser = async (
   email: string,
-  password: string
+  password: string,
 ): Promise<LoginResponse> => {
   try {
     const { data } = await api.post<LoginResponse>("/auth/login", {
@@ -20,14 +20,14 @@ export const loginUser = async (
       password,
     });
 
-    
-    localStorage.setItem("accessToken", data.data.token);
-    localStorage.setItem("userId", data.data.user);
+    if (data.status !== "success") {
+      throw new Error(data.message ?? "Utilisateur non autorisé");
+    }
 
+    // The JWT is stored in a secure HTTP-only cookie by the backend.
+    // No client-side token persistence is used.
     return data;
-
   } catch (error: unknown) {
-
     if (axios.isAxiosError<{ message?: string }>(error)) {
       throw new Error(error.response?.data?.message ?? "Login failed");
     }

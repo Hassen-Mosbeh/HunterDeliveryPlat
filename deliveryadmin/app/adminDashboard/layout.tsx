@@ -1,7 +1,6 @@
 import Sidebar from "@/components/adminDashboard/Sidebar";
 import Navbar from "@/components/adminDashboard/Navbar";
 import Footer from "@/components/adminDashboard/Footer";
-import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 
 export default function AdminLayout({
   children,
@@ -9,7 +8,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ProtectedRoute>
+    
     <div className="flex min-h-screen bg-[#0f172a] text-white">
       <Sidebar />
 
@@ -23,6 +22,6 @@ export default function AdminLayout({
         <Footer />
       </div>
     </div>
-    </ProtectedRoute>
+    
   );
 }

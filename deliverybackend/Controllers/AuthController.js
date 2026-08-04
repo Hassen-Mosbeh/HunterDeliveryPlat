@@ -33,20 +33,23 @@ const login = async (req, res) => {
     }
 
     const token = createToken(user);
-    const basicUser = {
-      id: user._id,
-      email: user.email,
-      phone: user.phone,
-      role: user.role,
-      userType: user.userType,
-    };
+    const isProduction = process.env.NODE_ENV === "production";
+
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      path: "/",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
 
     return res.status(200).json({
       status: "success",
       message: "Login successful",
-      data: {
-        token,
-        user: user.id
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -60,9 +63,13 @@ const login = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  return res.status(200).json({ message: "Logout successful" });
-};
+  res.clearCookie("accessToken", { path: "/" });
 
+  return res.status(200).json({
+    status: "success",
+    message: "Logout successful",
+  });
+};
 module.exports = {
   login,
   logout,

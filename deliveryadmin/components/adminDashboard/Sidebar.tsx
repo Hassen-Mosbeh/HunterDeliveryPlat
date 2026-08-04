@@ -9,6 +9,11 @@ import {
   Settings,
   LogOut,
   Menu,
+  Utensils,
+  Motorbike,
+  BellRing,
+  Percent,
+  ChartSpline,
 } from "lucide-react";
 
 import {
@@ -76,13 +81,37 @@ const Sidebar = () => {
           collapsed={collapsed}
         />
         <SidebarItem
-          icon={<Users size={20} />}
+          icon={<Motorbike size={20} />}
           label="Drivers"
           collapsed={collapsed}
         />
+
+        <SidebarItem
+          icon={<Utensils size={20} />}
+          label="Restaurants"
+          collapsed={collapsed}
+        />
+
         <SidebarItem
           icon={<Users size={20} />}
-          label="Restaurants"
+          label="Customers"
+          collapsed={collapsed}
+        />
+
+         <SidebarItem
+          icon={<ChartSpline  size={20} />}
+          label="Finance"
+          collapsed={collapsed}
+        />
+        <SidebarItem
+          icon={<Percent  size={20} />}
+          label="Commissions"
+          collapsed={collapsed}
+        />
+
+        <SidebarItem
+          icon={<BellRing  size={20} />}
+          label="Notifications"
           collapsed={collapsed}
         />
         <SidebarItem

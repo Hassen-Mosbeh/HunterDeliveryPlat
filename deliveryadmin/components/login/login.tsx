@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { loginUser } from "@/actions/auth/login";
@@ -9,12 +9,26 @@ import toast from "react-hot-toast";
 
 const LoginPage: React.FC = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [showPw, setShowPw] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+
+  useEffect(() => {
+    const authError = searchParams?.get("authError");
+    if (authError) {
+      if (authError.startsWith("invalid_role")) {
+        toast.error("Utilisateur non autorisé");
+      } else if (authError === "missing_token") {
+        toast.error("Aucun jeton d'authentification trouvé");
+      } else if (authError === "jwt_verify_failed_unknown") {
+        toast.error("Erreur de validation du jeton");
+      }
+    }
+  }, [searchParams]);
 
   const handleLogin = async (
     e: React.FormEvent<HTMLFormElement>,
@@ -27,12 +41,18 @@ const LoginPage: React.FC = () => {
       const response = await loginUser(email, password);
 
       if (response.status === "success") {
-        toast.success("Connexion réussie!");
-        router.push("/adminDashboard");
+        router.replace("/adminDashboard");
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        toast.error(err.message);
+        if (
+          err.message.toLowerCase().includes("unauthorized") ||
+          err.message.toLowerCase().includes("invalid_role")
+        ) {
+          toast.error("Utilisateur non autorisé");
+        } else {
+          toast.error(err.message);
+        }
       } else {
         toast.error("Login failed");
       }

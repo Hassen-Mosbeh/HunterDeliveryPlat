@@ -13,6 +13,7 @@ const productRouter = require("./Routes/ProductRoutes");
 const orderRouter = require("./Routes/OrderRoutes");
 const restaurantDashboardRouter = require("./Routes/Dashboard/RestaurantDashboardRoutes");
 const adminRouter = require("./Routes/AdminRoutes");
+const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
 
@@ -20,16 +21,24 @@ connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const frontendOrigin = process.env.FRONTEND_URL || "http://localhost:3000";
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: frontendOrigin,
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 204,
   }),
 );
+
+app.use(cookieParser());
+
 app.use(express.json());
 
 // Public authentication routes.
+app.use("/auth", authRouter);
 app.use("/api/auth", authRouter);
 
 // Protected user profile routes.

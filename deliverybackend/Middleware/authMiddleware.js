@@ -1,21 +1,31 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
-// Verify the bearer token and attach the decoded user payload to the request.
 const authMiddleware = (req, res, next) => {
-	const authHeader = req.headers.authorization;
+  try {
+    let token = null;
 
-	if (!authHeader || !authHeader.startsWith('Bearer ')) {
-		return res.status(401).json({ message: 'Unauthorized' });
-	}
+    // 1. Check cookie
+    if (req.cookies && req.cookies.accessToken) {
+      token = req.cookies.accessToken;
+    }
 
-	try {
-		const token = authHeader.split(' ')[1];
-		const decoded = jwt.verify(token, process.env.JWT_SECRET);
-		req.user = decoded;
-		return next();
-	} catch (error) {
-		return res.status(401).json({ message: 'Unauthorized' });
-	}
+    // 2. Fallback to Bearer
+    if (!token && req.headers.authorization?.startsWith("Bearer ")) {
+      token = req.headers.authorization.split(" ")[1];
+    }
+
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = decoded;
+    return next();
+
+  } catch (error) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
 };
 
 module.exports = authMiddleware;
